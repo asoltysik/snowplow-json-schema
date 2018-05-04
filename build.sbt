@@ -13,7 +13,8 @@ scalacOptions ++= Seq(
   "-Ywarn-dead-code",
   "-Ywarn-inaccessible",
   "-Ywarn-infer-any",
-  //"-Xfatal-warnings",
+
+  "-Xfatal-warnings",
 )
 
 libraryDependencies ++= Seq(
@@ -27,12 +28,16 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-generic-extras" % circeVersion,
   "io.circe" %% "circe-parser" % circeVersion,
 
-  "com.github.java-json-tools" % "json-schema-validator" % "2.2.8"
+  "com.github.java-json-tools" % "json-schema-validator" % "2.2.8",
+
+  "com.lihaoyi" %% "utest" % "0.6.3" % "test"
 )
+
+testFrameworks += new TestFramework("utest.runner.Framework")
 
 addCompilerPlugin(
   "org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full
 )
 
 
-cancelable in Global := true
+cancelable in Global := true // enables Ctrl+C without quitting sbt
