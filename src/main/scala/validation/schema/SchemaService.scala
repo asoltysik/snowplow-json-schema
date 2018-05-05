@@ -24,7 +24,7 @@ object Responses {
 
 }
 
-object SchemaService {
+class SchemaService(val repository: SchemaRepository) {
 
   implicit val encodeProcessingMessage: Encoder[ProcessingMessage] =
     Encoder.instance { a: ProcessingMessage =>
@@ -33,8 +33,7 @@ object SchemaService {
 
   val service = HttpService[IO] {
     case GET -> Root / schemaId =>
-      SchemaRepository
-        .getSchema(SchemaId(schemaId))
+      repository.getSchema(SchemaId(schemaId))
         .flatMap {
           case Some(schema) => Ok(schema.json)
           case None => NotFound()
@@ -46,13 +45,10 @@ object SchemaService {
         .map(SchemaValidation.validateSchema(_))
         .flatMap {
           case Right(schema) =>
-            SchemaRepository.addSchema(id, schema)
+            repository.addSchema(id, schema)
             Ok(Responses.success("uploadSchema", id).asJson)
           case Left(nel) =>
-            Ok(
-              Responses
-                .error("uploadSchema", id, nel.map(_.toString).toList: _*)
-                .asJson)
+            Ok(Responses.error("uploadSchema", id, nel.map(_.toString).toList: _*).asJson)
         }
   }
 

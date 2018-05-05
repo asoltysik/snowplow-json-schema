@@ -4,8 +4,14 @@ import cats.effect.IO
 
 import scala.collection.mutable
 
-// In-memory for now
-object SchemaRepository {
+trait SchemaRepository {
+
+  def addSchema(id: SchemaId, schema: ValidatedSchema): IO[Unit]
+
+  def getSchema(id: SchemaId): IO[Option[ValidatedSchema]]
+}
+
+object InMemorySchemaRepository extends SchemaRepository {
 
   private val schemaMap = mutable.HashMap.empty[String, ValidatedSchema]
 

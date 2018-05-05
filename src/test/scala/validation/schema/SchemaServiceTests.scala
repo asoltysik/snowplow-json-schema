@@ -7,10 +7,12 @@ import utest._
 
 object SchemaServiceTests extends TestSuite {
 
+  val service = new SchemaService(InMemorySchemaRepository).service
+
   val tests = Tests {
     "GET returns 404 for nonexistent schema id" - {
       val request = Request[IO](GET, Uri.uri("/schema/34"))
-      val response = SchemaService.service.orNotFound.run(request).unsafeRunSync()
+      val response = service.orNotFound.run(request).unsafeRunSync()
 
       assert(response.status == NotFound)
     }
