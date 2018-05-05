@@ -1,4 +1,4 @@
-package validation.schema
+package validation
 
 import cats.effect.IO
 

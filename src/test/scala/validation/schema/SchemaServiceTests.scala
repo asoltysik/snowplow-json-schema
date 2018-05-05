@@ -4,6 +4,7 @@ import cats.effect.IO
 import org.http4s._
 import org.http4s.dsl.io._
 import utest._
+import validation.{InMemorySchemaRepository, SchemaService}
 
 object SchemaServiceTests extends TestSuite {
 

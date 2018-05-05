@@ -1,17 +1,18 @@
-package validation.schema
+package validation
 
 import cats.data.NonEmptyList
 import cats.syntax.list._
 import com.github.fge.jackson.JsonLoader
-import com.github.fge.jsonschema.core.report.ProcessingMessage
-import com.github.fge.jsonschema.main.{JsonSchema, JsonSchemaFactory}
+import com.github.fge.jsonschema.core.report.{ProcessingMessage, ProcessingReport}
+import com.github.fge.jsonschema.main.JsonSchemaFactory
 import io.circe.Json
 
 import scala.collection.JavaConverters._
 
 object SchemaValidation {
 
-  private val validator = JsonSchemaFactory.byDefault.getSyntaxValidator
+  private val schemaFactory = JsonSchemaFactory.byDefault
+  private val validator = schemaFactory.getSyntaxValidator
 
   def validateSchema(schema: Json): Either[NonEmptyList[ProcessingMessage], ValidatedSchema] = {
     val report =
@@ -24,6 +25,11 @@ object SchemaValidation {
       val processingMessages = report.iterator().asScala.toList.toNel.get
       Left(processingMessages)
     }
+  }
+
+  def validateJson(validSchema: ValidatedSchema, jsonToValidate: Json): ProcessingReport = {
+    val schema = schemaFactory.getJsonSchema(JsonLoader.fromString(validSchema.json.toString))
+    schema.validate(JsonLoader.fromString(jsonToValidate.toString))
   }
 
 }

@@ -1,28 +1,12 @@
-package validation.schema
+package validation
 
 import cats.effect.IO
 import com.github.fge.jsonschema.core.report.ProcessingMessage
 import io.circe._
-import io.circe.generic.JsonCodec
 import io.circe.syntax._
-import io.circe.generic.extras.encoding.UnwrappedEncoder.encodeUnwrapped
 import org.http4s._
-import org.http4s.dsl.io._
 import org.http4s.circe._
-
-object Responses {
-  @JsonCodec case class Response(action: String,
-                                 id: SchemaId,
-                                 status: String,
-                                 messages: List[String])
-
-  def success(action: String, id: SchemaId, messages: String*): Response =
-    Response(action, id, "success", messages.toList)
-
-  def error(action: String, id: SchemaId, messages: String*): Response =
-    Response(action, id, "error", messages.toList)
-
-}
+import org.http4s.dsl.io._
 
 class SchemaService(val repository: SchemaRepository) {
 
