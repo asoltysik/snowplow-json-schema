@@ -1,7 +1,6 @@
 package validation
 
 import cats.effect.IO
-import cats.implicits._
 import io.circe.Json
 import io.circe.syntax._
 import org.http4s._
@@ -25,7 +24,7 @@ class ValidateService(val repository: SchemaRepository) {
               }
               else {
                 val errors = report.iterator.asScala.toList.map(_.toString)
-                Ok(Responses.error("validateDocument", id, errors: _*).asJson)
+                BadRequest(Responses.error("validateDocument", id, errors: _*).asJson)
               }
             }
 

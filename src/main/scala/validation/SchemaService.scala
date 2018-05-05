@@ -1,19 +1,15 @@
 package validation
 
 import cats.effect.IO
-import com.github.fge.jsonschema.core.report.ProcessingMessage
 import io.circe._
 import io.circe.syntax._
 import org.http4s._
 import org.http4s.circe._
 import org.http4s.dsl.io._
 
-class SchemaService(val repository: SchemaRepository) {
+import scala.collection.JavaConverters.asScalaIteratorConverter
 
-  implicit val encodeProcessingMessage: Encoder[ProcessingMessage] =
-    Encoder.instance { a: ProcessingMessage =>
-      Json.fromString(a.toString)
-    }
+class SchemaService(val repository: SchemaRepository) {
 
   val service = HttpService[IO] {
     case GET -> Root / schemaId =>
@@ -26,13 +22,16 @@ class SchemaService(val repository: SchemaRepository) {
     case req @ POST -> Root / schemaId =>
       val id = SchemaId(schemaId)
       req.as[Json]
-        .map(SchemaValidation.validateSchema(_))
+        .map(SchemaValidation.validateSchema)
         .flatMap {
-          case Right(schema) =>
-            repository.addSchema(id, schema)
-            Ok(Responses.success("uploadSchema", id).asJson)
-          case Left(nel) =>
-            Ok(Responses.error("uploadSchema", id, nel.map(_.toString).toList: _*).asJson)
+          case (report, schema) =>
+            if(report.isSuccess) {
+              repository.addSchema(id, schema)
+              Created(Responses.success("uploadSchema", id).asJson)
+            } else {
+              val errors = report.iterator.asScala.toList.map(_.toString)
+              BadRequest(Responses.error("uploadSchema", id, errors: _*).asJson)
+            }
         }
   }
 
