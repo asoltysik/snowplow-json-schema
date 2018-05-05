@@ -9,7 +9,7 @@ import org.http4s.circe._
 
 import scala.collection.JavaConverters._
 
-class ValidateService(val repository: SchemaRepository) {
+class ValidationService(val repository: SchemaRepository) {
 
   val service = HttpService[IO] {
     case req @ POST -> Root / schemaId =>

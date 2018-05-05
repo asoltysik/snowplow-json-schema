@@ -10,7 +10,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 object Main extends StreamApp[IO] {
 
   val schemaService = new SchemaService(InMemorySchemaRepository).service
-  val validateService = new ValidateService(InMemorySchemaRepository).service
+  val validateService = new ValidationService(InMemorySchemaRepository).service
 
   override def stream(args: List[String],
                       requestShutdown: IO[Unit]): Stream[IO, ExitCode] =
