@@ -1,6 +1,7 @@
 import io.circe.Json
 import io.circe.generic.JsonCodec
 import io.circe.generic.extras.encoding.UnwrappedEncoder.encodeUnwrapped
+import io.circe.generic.extras.decoding.UnwrappedDecoder.decodeUnwrapped
 
 package object validation {
 

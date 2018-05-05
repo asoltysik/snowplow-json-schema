@@ -30,7 +30,8 @@ libraryDependencies ++= Seq(
 
   "com.github.java-json-tools" % "json-schema-validator" % "2.2.8",
 
-  "com.lihaoyi" %% "utest" % "0.6.3" % "test"
+  "com.lihaoyi" %% "utest" % "0.6.3" % "test",
+  "io.circe" %% "circe-literal" % circeVersion % "test"
 )
 
 testFrameworks += new TestFramework("utest.runner.Framework")
