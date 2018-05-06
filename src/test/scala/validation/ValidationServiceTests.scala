@@ -1,7 +1,5 @@
 package validation
 
-import java.util.UUID
-
 import cats.effect.IO
 import org.http4s._
 import org.http4s.dsl.io._

@@ -6,6 +6,7 @@ scalaVersion := "2.12.6"
 
 val http4sVersion = "0.18.10"
 val circeVersion = "0.9.3"
+val doobieVersion = "0.5.2"
 
 scalacOptions ++= Seq(
   "-Ypartial-unification",
@@ -27,11 +28,14 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-generic" % circeVersion,
   "io.circe" %% "circe-generic-extras" % circeVersion,
   "io.circe" %% "circe-parser" % circeVersion,
+  "io.circe" %% "circe-literal" % circeVersion,
+
+  "org.tpolecat" %% "doobie-core" % doobieVersion,
+  "org.xerial" % "sqlite-jdbc" % "3.21.0.1",
 
   "com.github.java-json-tools" % "json-schema-validator" % "2.2.8",
 
-  "com.lihaoyi" %% "utest" % "0.6.3" % "test",
-  "io.circe" %% "circe-literal" % circeVersion % "test"
+  "com.lihaoyi" %% "utest" % "0.6.3" % "test"
 )
 
 testFrameworks += new TestFramework("utest.runner.Framework")
