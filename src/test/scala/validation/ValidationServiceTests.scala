@@ -14,7 +14,7 @@ object ValidationServiceTests extends TestSuite{
 
   val tests = Tests {
     "POST returns successful response for valid json and existent schema" - {
-      InMemorySchemaRepository.addSchema(SchemaId("v1"), ValidatedSchema(TestUtils.sampleValidSchema))
+      InMemorySchemaRepository.addSchema(SchemaId("v1"), ValidatedSchema(TestUtils.sampleValidSchema)).unsafeRunSync()
 
       val request = Request[IO](POST, Uri.uri("/v1")).withBody(TestUtils.sampleValidJson).unsafeRunSync()
       val response = service.orNotFound.run(request).unsafeRunSync()
@@ -25,7 +25,7 @@ object ValidationServiceTests extends TestSuite{
     }
 
     "POST returns error response with messages for invalid json and existent schema" - {
-      InMemorySchemaRepository.addSchema(SchemaId("v2"), ValidatedSchema(TestUtils.sampleValidSchema))
+      InMemorySchemaRepository.addSchema(SchemaId("v2"), ValidatedSchema(TestUtils.sampleValidSchema)).unsafeRunSync()
 
       val request = Request[IO](POST, Uri.uri("/v2")).withBody(TestUtils.sampleInvalidJson).unsafeRunSync()
       val response = service.orNotFound.run(request).unsafeRunSync()

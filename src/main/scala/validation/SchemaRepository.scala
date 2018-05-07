@@ -11,7 +11,7 @@ import scala.collection.mutable
 
 trait SchemaRepository {
 
-  def addSchema(id: SchemaId, schema: ValidatedSchema): IO[Unit]
+  def addSchema(id: SchemaId, schema: ValidatedSchema): IO[Boolean]
 
   def getSchema(id: SchemaId): IO[Option[ValidatedSchema]]
 }
@@ -20,20 +20,21 @@ object InMemorySchemaRepository extends SchemaRepository {
 
   private val schemaMap = mutable.HashMap.empty[String, ValidatedSchema]
 
-  def addSchema(id: SchemaId, schema: ValidatedSchema): IO[Unit] =
-    IO.pure(schemaMap.update(id.id, schema))
+  def addSchema(id: SchemaId, schema: ValidatedSchema): IO[Boolean] =
+    IO {
+      println("addSchema!")
+      schemaMap.update(id.id, schema)
+      true
+    }
 
   def getSchema(id: SchemaId): IO[Option[ValidatedSchema]] =
-    IO.pure(schemaMap.get(id.id))
-
+    IO(schemaMap.get(id.id))
 }
 
 object SqliteSchemaRepository extends SchemaRepository {
 
   val xa = Transactor.fromDriverManager[IO]("org.sqlite.JDBC", "jdbc:sqlite:schemas.sqlite")
   Statements.ddl.run.transact(xa).unsafeRunSync() // we want it to crash early, hence unsafeRunSync
-
-  //implicit val doobieLogging: LogHandler = LogHandler.jdkLogHandler
 
   object Statements {
     val ddl: Update0 =
@@ -52,15 +53,15 @@ object SqliteSchemaRepository extends SchemaRepository {
         .update
   }
 
-  def addSchema(id: SchemaId, schema: ValidatedSchema): IO[Unit] =
+  def addSchema(id: SchemaId, schema: ValidatedSchema): IO[Boolean] =
     Statements.addSchema(id.id, schema.json.toString)
       .run
       .transact(xa)
-      .map(_ => ())
+      .map(num => num == 1)
 
   def getSchema(id: SchemaId): IO[Option[ValidatedSchema]] =
     Statements.getSchema(id.id)
-      .map(str => ValidatedSchema(parse(str).right.get))
+      .map(str => ValidatedSchema(parse(str).right.get)) // it'll always be Right, could be improved though
       .option
       .transact(xa)
 }

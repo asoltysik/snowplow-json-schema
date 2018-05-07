@@ -25,12 +25,12 @@ object SchemaServiceTests extends TestSuite {
     }
 
     "GET returns json for existent schema id" - {
-      InMemorySchemaRepository.addSchema(SchemaId("s2"), ValidatedSchema(TestUtils.sampleValidSchema))
+      InMemorySchemaRepository.addSchema(SchemaId("s2"), ValidatedSchema(TestUtils.sampleValidSchema)).unsafeRunSync()
       val request = Request[IO](GET, Uri.uri("/s2"))
       val response = service.orNotFound.run(request).unsafeRunSync()
 
-      assert(response.as[Json].unsafeRunSync() == TestUtils.sampleValidSchema)
       assert(response.status == Ok)
+      assert(response.as[Json].unsafeRunSync() == TestUtils.sampleValidSchema)
     }
 
     "POST returns successful response for valid schema" - {

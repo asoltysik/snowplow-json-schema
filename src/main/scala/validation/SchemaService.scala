@@ -26,8 +26,13 @@ class SchemaService(val repository: SchemaRepository) {
         .flatMap {
           case (report, schema) =>
             if(report.isSuccess) {
-              repository.addSchema(id, schema).flatMap { _ =>
-                Created(Responses.success("uploadSchema", id).asJson)
+              repository.addSchema(id, schema).flatMap { added =>
+                if(added) {
+                  println("Added!")
+                  Created(Responses.success("uploadSchema", id).asJson)
+                }
+                else
+                  InternalServerError()
               }
             } else {
               val errors = report.iterator.asScala.toList.map(_.toString)
