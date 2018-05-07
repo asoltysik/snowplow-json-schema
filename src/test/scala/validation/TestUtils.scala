@@ -21,9 +21,52 @@ object TestUtils {
   val sampleValidJson = json"""13"""
   val sampleInvalidJson = json"""{"foo": "bar"}"""
 
+  val configSchema = json"""{
+                              "$$schema": "http://json-schema.org/draft-04/schema#",
+                              "type": "object",
+                              "properties": {
+                                "source": {
+                                  "type": "string"
+                                },
+                                "destination": {
+                                  "type": "string"
+                                },
+                                "timeout": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 32767
+                                },
+                                "chunks": {
+                                  "type": "object",
+                                  "properties": {
+                                    "size": {
+                                      "type": "integer"
+                                    },
+                                    "number": {
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "required": ["size"]
+                                }
+                              },
+                              "required": ["source", "destination"]
+                            }"""
+
+  val config = json"""{
+                        "source": "/home/alice/image.iso",
+                        "destination": "/mnt/storage",
+                        "timeout": null,
+                        "chunks": {
+                          "size": 1024,
+                          "number": null
+                        }
+                      }"""
+
 }
 
 object DoobieTestUtils {
+  // ported from doobie-scalatest
+
   def formatReport(
                     args: AnalysisArgs,
                     report: AnalysisReport
@@ -59,7 +102,7 @@ object DoobieTestUtils {
   private def checkImpl(args: AnalysisArgs, transactor: Transactor[IO]): Unit = {
     val report = analyzeIO(args, transactor).unsafeRunSync()
     if(!report.succeeded) {
-      throw SqlAnalysisError(formatReport(args, report).toString())
+      throw SqlAnalysisError(formatReport(args, report).toString)
     }
   }
 }

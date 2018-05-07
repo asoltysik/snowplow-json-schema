@@ -44,5 +44,16 @@ object ValidationServiceTests extends TestSuite{
       assert(response.isDefined)
       assert(response.get.status == NotFound)
     }
+
+    "POST with config schema + nulls returns successful response" - {
+      InMemorySchemaRepository.addSchema(SchemaId("v4"), ValidatedSchema(TestUtils.configSchema)).unsafeRunSync()
+
+      val request = Request[IO](POST, Uri.uri("/v4")).withBody(TestUtils.config).unsafeRunSync()
+      val response = service.orNotFound.run(request).unsafeRunSync()
+      val body = response.as[Responses.Response].unsafeRunSync()
+
+      assert(response.status == Ok)
+      assert(body == Responses.success("validateDocument", SchemaId("v4")))
+    }
   }
 }

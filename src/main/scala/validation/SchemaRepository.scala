@@ -4,31 +4,13 @@ import cats.effect.IO
 import doobie._
 import doobie.implicits._
 import doobie.util.query.Query0
-import io.circe.Json
 import io.circe.parser.parse
-
-import scala.collection.mutable
 
 trait SchemaRepository {
 
   def addSchema(id: SchemaId, schema: ValidatedSchema): IO[Boolean]
 
   def getSchema(id: SchemaId): IO[Option[ValidatedSchema]]
-}
-
-object InMemorySchemaRepository extends SchemaRepository {
-
-  private val schemaMap = mutable.HashMap.empty[String, ValidatedSchema]
-
-  def addSchema(id: SchemaId, schema: ValidatedSchema): IO[Boolean] =
-    IO {
-      println("addSchema!")
-      schemaMap.update(id.id, schema)
-      true
-    }
-
-  def getSchema(id: SchemaId): IO[Option[ValidatedSchema]] =
-    IO(schemaMap.get(id.id))
 }
 
 object SqliteSchemaRepository extends SchemaRepository {
